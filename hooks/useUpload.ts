@@ -5,7 +5,7 @@ import { useUser } from "@clerk/nextjs";
 //import { getFirestore } from "firebase/firestore";
 import { doc, setDoc } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import { useRouter } from "next/navigation";
+//import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
@@ -23,7 +23,7 @@ function useUpload() {
     const [status, setStatus] = useState<string | null>(null);
     const [fileId, setFileId] = useState<Status | null>(null);
     const {user} = useUser();
-    const router = useRouter();
+    //const router = useRouter();
 
     const handleUpload = async (file: File) => {
         if(!file || !user) return;
@@ -36,14 +36,12 @@ function useUpload() {
         const uploadTask = uploadBytesResumable(storageRef, file);
 
         uploadTask.on('state_changed', (snapshot) => {
-            const percentage = Math.round(snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            const percent = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
             setStatus(StatusText.UPLOADING);
-            setProgress(percentage);
-    },
-    (error) => {
+            setProgress(percent);
+    }, (error) => {
         console.error("Error uploading file",error);
-    },
-    async () => {
+        }, async () => {
         setStatus(StatusText.UPLOADED);
         const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
 
@@ -54,14 +52,14 @@ function useUpload() {
             type: file.type,
             downloadUrl: downloadUrl,
             ref: uploadTask.snapshot.ref.fullPath,
-            createdAt: new Date(),//serverTimestamp(),
+            createdAt: new Date(),
         })
 
         setStatus(StatusText.GENERATING);
         //Generate AI embeddings...
 
         setFileId(fileIdToUploadTo);
-    });
+            });
     }
 
     return {progress, status, fileId, handleUpload};
