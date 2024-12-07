@@ -1,5 +1,6 @@
 "use client"
 
+import { generateEmbeddings } from "@/actions/generateEmbeddings";
 import { db, storage } from "@/firebase";
 import { useUser } from "@clerk/nextjs";
 //import { getFirestore } from "firebase/firestore";
@@ -57,6 +58,7 @@ function useUpload() {
 
         setStatus(StatusText.GENERATING);
         //Generate AI embeddings...
+        await generateEmbeddings(fileIdToUploadTo);
 
         setFileId(fileIdToUploadTo);
             });
